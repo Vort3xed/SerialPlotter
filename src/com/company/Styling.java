@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -33,15 +34,22 @@ public class Styling {
         name.setText(text);
         name.setStyle(cssStyle);
     }
+    public static void styleButtons(Button name, String text, int maxHeight, int maxWidth, String cssStyle){
+        name.setText(text);
+        name.setMinHeight(maxHeight);
+        name.setMinWidth(maxWidth);
+        name.setStyle(cssStyle);
+    }
     public static void styleCircles(Circle name, double posX, double posY){
         name.setLayoutX(posX);
         name.setLayoutY(posY);
     }
-    public static void styleRectangles(Rectangle name, double posX, double posY, double width, double height){
+    public static void styleRectangles(Rectangle name, double posX, double posY, double width, double height, ImagePattern img){
         name.setLayoutX(posX);
         name.setLayoutY(posY);
         name.setWidth(width);
         name.setHeight(height);
+        name.setFill(img);
     }
     public static void styleLines(Line name, double startX, double startY, double endX, double endY, int strokeWidth){
         name.setStartX(startX);
@@ -70,5 +78,10 @@ public class Styling {
         stage.setScene(scene);
         stage.setResizable(resizability);
         stage.setTitle(title);
+    }
+    public static void styleVBox(VBox box, int posX, int posY, int spacing){
+        box.setLayoutX(posX);
+        box.setLayoutY(posY);
+        box.setSpacing(spacing);
     }
 }
