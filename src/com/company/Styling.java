@@ -40,6 +40,14 @@ public class Styling {
         name.setMinWidth(maxWidth);
         name.setStyle(cssStyle);
     }
+    public static void styleButtons(Button name, int posX, int posY, String text, int maxHeight, int maxWidth, String cssStyle){
+        name.setText(text);
+        name.setLayoutX(posX);
+        name.setLayoutY(posY);
+        name.setMinHeight(maxHeight);
+        name.setMinWidth(maxWidth);
+        name.setStyle(cssStyle);
+    }
     public static void styleCircles(Circle name, double posX, double posY){
         name.setLayoutX(posX);
         name.setLayoutY(posY);

@@ -10,6 +10,7 @@ public class StaticNodes {
     static Line xAxis = new Line();
     static Button toggleRealTime = new Button();
     static Button parseProvidedData = new Button();
+    static Button uploadFileToVisualize = new Button();
     static Rectangle leftCoverRectangle = new Rectangle();
     static Rectangle rightCoverRectangle = new Rectangle();
     static VBox buttonArray = new VBox();
