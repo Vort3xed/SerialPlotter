@@ -33,6 +33,7 @@ public class SerialPlotter extends Application {
     static int step = 50;
     static int range = 5;
     static double speedFactor = 5;
+    static boolean realTimeDisplay = true;
 
     public void start(Stage stage) {
         g.getChildren().add(pointPlane);
@@ -61,7 +62,7 @@ public class SerialPlotter extends Application {
         Styling.styleButtons(uploadFileToVisualize,240,525,"Upload Data",60,180,"-fx-background-color: #808080");
         uploadFileToVisualize.setMaxWidth(180);
 
-        Styling.styleButtons(toggleRealTime,"Displaying Realtime",60,180,"-fx-background-color: #00ff00");
+        Styling.styleButtons(toggleRealTime,"Displaying Realtime",60,180,"-fx-background-color: #50C878");
         Styling.styleButtons(parseProvidedData,"Parse Data",60,180,"-fx-background-color: #808080");
         buttonArray.getChildren().addAll(toggleRealTime,parseProvidedData);
 
@@ -116,17 +117,21 @@ public class SerialPlotter extends Application {
             statusIdentifier.setText("Parse Failed! Integers Only!");
         }
     }
-    static boolean realTimeDisplay = true;
     private void handleRealTimeModulation(ActionEvent event) {
         if (realTimeDisplay) {
             setterArray.getChildren().remove(setSpeed);
             realTimeDisplay = false;
+            toggleRealTime.setStyle("-fx-background-color: #6082B6");
+            toggleRealTime.setText("Displaying Instant");
         } else {
-
+            setterArray.getChildren().remove(enterData);
             setterArray.getChildren().add(setSpeed);
             realTimeDisplay = true;
+            setterArray.getChildren().add(enterData);
+            toggleRealTime.setStyle("-fx-background-color: #50C878");
+            toggleRealTime.setText("Displaying Realtime");
         }
-    }
+    }//#32CD32
     private void handleVisualizeData(ActionEvent event) {
         animate(extractFileData());
         canContinueParsing = true;
