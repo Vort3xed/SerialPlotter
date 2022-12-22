@@ -40,12 +40,12 @@ public class Styling {
         name.setMinWidth(maxWidth);
         name.setStyle(cssStyle);
     }
-    public static void styleButtons(Button name, int posX, int posY, String text, int maxHeight, int maxWidth, String cssStyle){
+    public static void styleButtons(Button name, int posX, int posY, String text, int minHeight, int minWidth, String cssStyle){
         name.setText(text);
         name.setLayoutX(posX);
         name.setLayoutY(posY);
-        name.setMinHeight(maxHeight);
-        name.setMinWidth(maxWidth);
+        name.setMinHeight(minHeight);
+        name.setMinWidth(minWidth);
         name.setStyle(cssStyle);
     }
     public static void styleCircles(Circle name, double posX, double posY){
@@ -71,16 +71,26 @@ public class Styling {
         name.setLayoutY(posY);
         name.setTextFill(color);
     }
-    public static void styleLabels(Label name, Font font, double posX, double posY){
+    public static void styleLabels(Label name, Font font, String labelContents, double posX, double posY){
         name.setFont(font);
+        name.setText(labelContents);
         name.setLayoutX(posX);
         name.setLayoutY(posY);
+    }
+    public static void styleLabels(Label name, String text, Font font){
+        name.setText(text);
+        name.setFont(font);
     }
     public static void styleTextBoxes(TextField textFieldBoxes, String promptText, boolean traverse, double posX, double posY){
         textFieldBoxes.setPromptText(promptText);
         textFieldBoxes.setFocusTraversable(traverse);
         textFieldBoxes.setLayoutX(posX);
         textFieldBoxes.setLayoutY(posY);
+    }
+    public static void styleTextBoxes(TextField textFieldBoxes, String promptText, boolean traverse){
+        textFieldBoxes.setPromptText(promptText);
+        textFieldBoxes.setFocusTraversable(traverse);
+
     }
     public static void styleStage(Stage stage, Scene scene, String title, Boolean resizability){
         stage.setScene(scene);

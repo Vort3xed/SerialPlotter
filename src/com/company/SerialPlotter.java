@@ -10,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -26,9 +27,12 @@ public class SerialPlotter extends Application {
     static Group g = new Group();
     static Pane pointPlane = new Pane();
     static Scene scene = new Scene(g, 1200, 680);
-    static boolean canContinueParsing = true;
 
+    static boolean canContinueParsing = true;
     static String selectedFileLocation = "src/com/company/DataVis/data.txt";
+    static int step = 50;
+    static int range = 5;
+    static double speedFactor = 5;
 
     public void start(Stage stage) {
         g.getChildren().add(pointPlane);
@@ -42,32 +46,33 @@ public class SerialPlotter extends Application {
         Styling.styleRectangles(rightCoverRectangle,1160,0,210,500,createGridPattern());
         g.getChildren().addAll(leftCoverRectangle,rightCoverRectangle);
 
-        Styling.styleVBox(buttonArray,50, 525,10);
-        g.getChildren().addAll(buttonArray);
+        Styling.styleVBox(buttonArray,50, 525,7);
+        Styling.styleVBox(setterArray,500,550,7);
+        g.getChildren().addAll(buttonArray,setterArray);
 
         toggleRealTime.setOnAction(this::handleRealTimeModulation);
         parseProvidedData.setOnAction(this::handleVisualizeData);
         uploadFileToVisualize.setOnAction(this::handleFileSelection);
-
-    }
-
-    private void handleFileSelection(ActionEvent event) {
-        if (canContinueParsing) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Select file");
-            File selectedFile = fileChooser.showOpenDialog(uploadFileToVisualize.getScene().getWindow());
-            if (selectedFile != null) {
-                selectedFileLocation = selectedFile.getAbsolutePath();
-            }
-        }
+        enterData.setOnAction(this::handleDataParsing);
     }
 
     public static void initializeInterface(SetInterface interfaceInfo) {
-        buttonArray.getChildren().addAll(toggleRealTime,parseProvidedData);
-        g.getChildren().add(uploadFileToVisualize);
+        g.getChildren().addAll(uploadFileToVisualize,statusIdentifier);
+        Styling.styleButtons(uploadFileToVisualize,240,525,"Upload Data",60,180,"-fx-background-color: #808080");
+        uploadFileToVisualize.setMaxWidth(180);
+
         Styling.styleButtons(toggleRealTime,"Displaying Realtime",60,180,"-fx-background-color: #00ff00");
         Styling.styleButtons(parseProvidedData,"Parse Data",60,180,"-fx-background-color: #808080");
-        Styling.styleButtons(uploadFileToVisualize,240,525,"Upload Data",60,100,"-fx-background-color: #808080");
+        buttonArray.getChildren().addAll(toggleRealTime,parseProvidedData);
+
+      //  Styling.styleLabels();
+        Styling.styleLabels(statusIdentifier, Font.font(18), "Enter Range and Step",500,520);
+        Styling.styleTextBoxes(setRange,"Enter Y Range",true);
+        Styling.styleTextBoxes(setStep,"Enter Step",true);
+        Styling.styleTextBoxes(setSpeed,"Enter Speed",true);
+        Styling.styleButtons(enterData,"Submit",30,90,"-fx-background-color: #808080");
+        setterArray.getChildren().addAll(setRange,setStep,setSpeed,enterData);
+
         if (interfaceInfo.getModifyBackground().equals("grid")) {
             scene.setFill(createGridPattern());
         } else if (interfaceInfo.getModifyBackground().equals("gradient")) {
@@ -80,17 +85,50 @@ public class SerialPlotter extends Application {
         if (interfaceInfo.isAllowAxis()) {
             Styling.styleLines(xAxis, 50, 500, 1150, 500, 5);
             Styling.styleLines(yAxis, 50, 50, 50, 500, 5);
-
             g.getChildren().add(xAxis);
             g.getChildren().add(yAxis);
         }
 
     }
+    private void handleFileSelection(ActionEvent event) {
+        if (canContinueParsing) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select file");
+            File selectedFile = fileChooser.showOpenDialog(uploadFileToVisualize.getScene().getWindow());
+            if (selectedFile != null) {
+                selectedFileLocation = selectedFile.getAbsolutePath();
+                uploadFileToVisualize.setText("Uploaded: "+selectedFile.getName());
+            }
+        }
+    }
+    private void handleDataParsing(ActionEvent event) {
+        try {
+            step = Integer.parseInt(setStep.getText());
+            range = Integer.parseInt(setRange.getText());
+            if (realTimeDisplay) {
+                speedFactor = Integer.parseInt(setSpeed.getText());
+                setSpeed.clear();
+            }
+            setStep.clear();
+            setRange.clear();
+            statusIdentifier.setText("Parse Successful");
+        } catch (Exception e) {
+            statusIdentifier.setText("Parse Failed! Integers Only!");
+        }
+    }
+    static boolean realTimeDisplay = true;
     private void handleRealTimeModulation(ActionEvent event) {
-        System.out.println("hi");
+        if (realTimeDisplay) {
+            setterArray.getChildren().remove(setSpeed);
+            realTimeDisplay = false;
+        } else {
+
+            setterArray.getChildren().add(setSpeed);
+            realTimeDisplay = true;
+        }
     }
     private void handleVisualizeData(ActionEvent event) {
-        animate(extractFileData(),50);
+        animate(extractFileData());
         canContinueParsing = true;
     }
 
@@ -113,11 +151,11 @@ public class SerialPlotter extends Application {
         return new String[0];
     }
 
-    public static void animate(String[] array,int step){
+    public static void animate(String[] array){
         if (canContinueParsing) {
             Circle previousCircle = null;
             for (int i = 0; i < array.length; i++) {
-                Circle circle = new Circle(i * step + 1250, 500 - Integer.parseInt(array[i]) * 5, 3);
+                Circle circle = new Circle(i * step + 1250, 500 - Integer.parseInt(array[i]) * range, 3);
                 pointPlane.getChildren().add(circle);
 
                 if (previousCircle != null) {
@@ -129,8 +167,8 @@ public class SerialPlotter extends Application {
                 previousCircle = circle;
             }
             Timeline timeline = new Timeline();
-            timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(5 + 0.05 * array.length), new KeyValue(pointPlane.translateXProperty(),
-                    -500 - array.length * 10)));
+            timeline.getKeyFrames().add(new KeyFrame(Duration.seconds((speedFactor/1000) * step * array.length), new KeyValue(pointPlane.translateXProperty(),
+                    -500 - array.length * step)));
             timeline.play();
 
         }
