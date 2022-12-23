@@ -4,10 +4,8 @@ import javafx.animation.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
@@ -15,8 +13,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static com.company.GeneratePlane.createGridPattern;
@@ -133,7 +129,11 @@ public class SerialPlotter extends Application {
         }
     }//#32CD32
     private void handleVisualizeData(ActionEvent event) {
-        animate(extractFileData());
+        if(realTimeDisplay) {
+            graphRealTime(extractFileData());
+        } else {
+            graph(extractFileData());
+        }
         canContinueParsing = true;
     }
 
@@ -156,7 +156,7 @@ public class SerialPlotter extends Application {
         return new String[0];
     }
 
-    public static void animate(String[] array){
+    public static void graphRealTime(String[] array){
         if (canContinueParsing) {
             Circle previousCircle = null;
             for (int i = 0; i < array.length; i++) {
@@ -176,6 +176,24 @@ public class SerialPlotter extends Application {
                     -500 - array.length * step)));
             timeline.play();
 
+        }
+    }
+    public static void graph(String[] array){
+        double pointDiff = 1080/Double.parseDouble(String.valueOf(array.length));
+        if (canContinueParsing){
+            Circle previousCircle = null;
+            for (int i = 0; i<array.length;i++){
+                Circle circle = new Circle(50 + i*pointDiff,500 - Integer.parseInt(array[i]) * range,3);
+                pointPlane.getChildren().add(circle);
+
+                if (previousCircle != null) {
+                    Line line = new Line(previousCircle.getCenterX(), previousCircle.getCenterY(),
+                            circle.getCenterX(), circle.getCenterY());
+                    pointPlane.getChildren().add(line);
+                }
+
+                previousCircle = circle;
+            }
         }
     }
 
